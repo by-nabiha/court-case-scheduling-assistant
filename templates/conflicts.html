@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Scheduling Conflicts</h1>
+<p class="sub">Comprehensive conflict audit · Continuous verification across judicial and courtroom calendars</p>
+{% if can('scan_conflicts') %}
+<div class="card row"><div><b>Scan current schedule</b><div class="small">Runs every active hearing through the conflict-check chain again.</div></div>
+  <div class="shrink"><form method="post" action="{{ url_for('conflicts_scan') }}">{{ csrf() }}<button class="btn">Run conflict scan</button></form></div></div>
+{% endif %}
+<div class="card"><table>
+  <tr><th>#</th><th>Detected</th><th>Hearing</th><th>Type</th><th>Description</th><th>Status</th><th></th></tr>
+  {% for c in conflicts %}
+  <tr><td>{{ c.conflict_id }}</td><td class="mono">{{ c.detected_at[5:16] }}</td>
+    <td>{% if c.schedule_id %}<a href="{{ url_for('hearing_override', sid=c.schedule_id) }}">#{{ c.schedule_id }}</a>{% endif %}</td>
+    <td class="mono">{{ c.conflict_type }}</td><td>{{ c.description }}{% if c.resolution_note %}<div class="small">Resolution: {{ c.resolution_note }}</div>{% endif %}</td>
+    <td><span class="badge b-{{ c.resolution_status }}">{{ c.resolution_status|status_label }}</span></td>
+    <td>{% if c.resolution_status == 'OPEN' %}
+      {% if c.schedule_id and can('override_hearing') %}<a class="btn ghost sm" href="{{ url_for('hearing_override', sid=c.schedule_id) }}">Reschedule</a>{% endif %}
+      {% if can('resolve_conflict') %}<details><summary>Mark resolved</summary>
+        <form method="post" action="{{ url_for('conflict_resolve', cid=c.conflict_id) }}">{{ csrf() }}
+          <input type="text" name="note" placeholder="How was it resolved?" maxlength="200" required>
+          <p><button class="btn sm">Resolve</button></p></form></details>{% endif %}
+    {% endif %}</td></tr>
+  {% else %}<tr><td colspan="7" class="empty">No conflicts recorded.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Hearing Schedule</h1>
+<p class="sub">Automated hearing docket · Conflict-free scheduling · Judicial approval workflow</p>
+{% if can('generate_schedule') %}
+<div class="card">
+  <h2>Generate recommended schedule</h2>
+  <form method="post" action="{{ url_for('schedule_generate') }}" class="row">{{ csrf() }}
+    <div><label>Start date</label><input type="date" name="start" value="{{ start }}" min="{{ today }}" required></div>
+    <div><label>Number of days</label><input type="number" name="days" value="14" min="1" max="60" required></div>
+    <div class="shrink"><button class="btn">Generate</button></div>
+  </form>
+  <p class="small">Prioritized Backlog → for each case in rank order, the earliest slot that passes every check:
+    judge available → courtroom available → judge not double-booked → courtroom not double-booked → case not already scheduled.</p>
+</div>
+{% endif %}
+<div class="tabs">
+  <a href="{{ url_for('schedule') }}" class="{{ 'on' if not status }}">All</a>
+  {% for s in ['PENDING_APPROVAL','CHANGES_REQUESTED','APPROVED','COMPLETED','CANCELLED'] %}
+  <a href="{{ url_for('schedule', status=s) }}" class="{{ 'on' if status == s }}">{{ s|status_label }}</a>{% endfor %}
+</div>
+<div class="card"><div class="wrap"><table>
+  <tr><th>#</th><th>Date</th><th>Time</th><th>Case</th><th>Judge</th><th>Room</th><th>Status</th><th>Actions</th></tr>
+  {% for h in hearings %}{% set c = cases.get(h.case_id) %}
+  <tr>
+    <td>{{ h.schedule_id }}</td><td class="nowrap">{{ h.hearing_date }}<div class="small">{{ h.hearing_date|weekday }}</div></td>
+    <td class="nowrap">{{ h.hearing_time }}–{{ h.end_time }}</td>
+    <td><a href="{{ url_for('case_detail', case_id=h.case_id) }}" class="mono">{{ h.case_id }}</a>
+      {% if c %}<div class="small">{{ c.case_title }}</div>
+        {% if c.is_urgent %}<span class="badge b-urgent">Urgent</span>{% endif %}
+        {% if c.priority_level != 'UNASSESSED' %}<span class="badge b-{{ c.priority_level }}">{{ c.priority_level }}</span>{% endif %}{% endif %}</td>
+    <td>{{ judge_names.get(h.judge_id) }}</td><td>{{ room_names.get(h.courtroom_id) }}</td>
+    <td><span class="badge b-{{ h.status }}">{{ h.status|status_label }}</span>
+      {% if h.schedule_id in open_conf %}<span class="badge b-OPEN">Conflict</span>{% endif %}
+      <div class="small">{{ h.reason }}</div></td>
+    <td><div class="actions">
+      {% if can('approve_hearing') and h.state.can('approve') %}
+        <form method="post" action="{{ url_for('hearing_approve', sid=h.schedule_id) }}">{{ csrf() }}<button class="btn green sm">Approve</button></form>{% endif %}
+      {% if can('override_hearing') and h.state.can('reschedule') %}
+        <a class="btn ghost sm" href="{{ url_for('hearing_override', sid=h.schedule_id) }}">Override / Reschedule</a>{% endif %}
+      {% if can('complete_hearing') and h.state.can('complete') %}
+        <form method="post" action="{{ url_for('hearing_complete', sid=h.schedule_id) }}" data-confirm="Mark hearing as completed and dispose the case?">{{ csrf() }}<button class="btn ghost sm">Complete</button></form>{% endif %}
+    </div>
+    {% if can('request_changes') and h.state.can('request_changes') %}
+      <details><summary>Request changes</summary>
+        <form method="post" action="{{ url_for('hearing_changes', sid=h.schedule_id) }}">{{ csrf() }}
+          <input type="text" name="reason" placeholder="Reason" maxlength="200" required>
+          <p><button class="btn red sm">Send back</button></p></form></details>{% endif %}
+    {% if can('cancel_hearing') and h.state.can('cancel') %}
+      <details><summary>Cancel hearing</summary>
+        <form method="post" action="{{ url_for('hearing_cancel', sid=h.schedule_id) }}">{{ csrf() }}
+          <input type="text" name="reason" placeholder="Reason" maxlength="200" required>
+          <p><button class="btn red sm">Cancel hearing</button></p></form></details>{% endif %}
+    </td>
+  </tr>
+  {% else %}<tr><td colspan="8" class="empty">No hearings. {% if can('generate_schedule') %}Generate a schedule above.{% endif %}</td></tr>{% endfor %}
+</table></div>
+{% if user.role == Role.JUDGE %}<p class="small">As a judge you can approve or change only hearings assigned to you.</p>{% endif %}
+</div>
+{% endblock %}

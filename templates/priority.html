@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Priority Engine</h1>
+<p class="sub">Objective backlog prioritization · Multi-factor scoring · Transparent score breakdown</p>
+<div class="grid g-side">
+<div class="card">
+  <h2>Prioritised backlog</h2>
+  {% set top = (ranked|map(attribute='score')|max) if ranked else 1 %}
+  <div class="wrap"><table>
+  <tr><th>Rank</th><th>Case</th><th>Flags</th><th class="num">Waiting</th><th>Score</th><th>Level</th><th>Status</th></tr>
+  {% for r in ranked %}{% set c = r.case %}
+  <tr><td class="num"><b>{{ r.rank }}</b></td>
+    <td><a href="{{ url_for('case_detail', case_id=c.case_id) }}" class="mono">{{ c.case_id }}</a>
+        <div class="small">{{ c.type_label }} · {{ c.case_title }}</div>
+        <details><summary>Why this score?</summary>
+          {% for f in r.factors %}<div class="factor"><span>{{ f.name }} <span class="small">– {{ f.explanation }}</span></span><b>+{{ f.points }}</b></div>{% endfor %}
+          <div class="factor"><span><b>Total</b></span><b>{{ r.score }}</b></div>
+        </details></td>
+    <td>{% if c.is_urgent %}<span class="badge b-urgent">Urgent</span>{% endif %}
+        {% if c.vulnerable_party %}<span class="badge b-vulnerable">Vulnerable</span>{% endif %}</td>
+    <td class="num">{{ c.waiting_days() }} d</td>
+    <td>{{ r.score }}<div class="bar"><span class="w{{ ((r.score / (top or 1) * 10)|round|int * 10) if top else 0 }}"></span></div></td>
+    <td><span class="badge b-{{ r.level }}">{{ r.level }}</span></td>
+    <td><span class="badge b-{{ c.case_status }}">{{ c.case_status|status_label }}</span></td></tr>
+  {% else %}<tr><td colspan="7" class="empty">No validated cases in the backlog. Validate pending cases first.</td></tr>{% endfor %}
+  </table></div>
+  <p class="small">Only VALIDATED cases enter the backlog. Ties are broken by filing date, then case ID, so the same data always gives the same order (Deterministic ordering).</p>
+</div>
+
+<div>
+<div class="card">
+  <h2>Active Prioritization Algorithm</h2>
+  {% if can('set_priority_strategy') %}
+  <form method="post" action="{{ url_for('priority_strategy') }}">{{ csrf() }}
+    {% for key, name, desc in settings.strategies %}
+      <label class="check"><input type="radio" name="strategy" value="{{ key }}" {{ 'checked' if key == settings.active }}> {{ name }}</label>
+      <p class="small">{{ desc }}</p>
+    {% endfor %}
+    <div id="weights" {{ 'hidden' if settings.active != 'WEIGHTED' }}>
+      <h3>Weights</h3>
+      <div class="row">
+        <div><label>Urgency</label><input type="number" step="0.5" min="0" max="1000" name="w_urgency" value="{{ settings.weights.urgency }}"></div>
+        <div><label>Vulnerability</label><input type="number" step="0.5" min="0" max="1000" name="w_vulnerability" value="{{ settings.weights.vulnerability }}"></div>
+      </div><div class="row">
+        <div><label>Points / year waiting</label><input type="number" step="0.5" min="0" max="1000" name="w_waiting_per_year" value="{{ settings.weights.waiting_per_year }}"></div>
+        <div><label>Waiting cap</label><input type="number" step="0.5" min="0" max="1000" name="w_waiting_cap" value="{{ settings.weights.waiting_cap }}"></div>
+        <div><label>Case-type ×</label><input type="number" step="0.1" min="0" max="1000" name="w_case_type" value="{{ settings.weights.case_type }}"></div>
+      </div>
+    </div>
+    <label>Reason for change (audited)</label><input type="text" name="reason" maxlength="200" required>
+    <p><button class="btn">Apply rule</button></p>
+  </form>
+  {% else %}
+    {% for key, name, desc in settings.strategies if key == settings.active %}<p><b>{{ name }}</b></p><p class="small">{{ desc }}</p>{% endfor %}
+    <p class="small">Only the Court Administrator or System Administrator can change the rule.</p>
+  {% endif %}
+</div>
+{% if can('recalculate_priorities') %}
+<div class="card"><h2>Save priorities</h2>
+  <p class="small">Stores the current scores on each case and moves VALIDATED cases to PRIORITIZED status.</p>
+  <form method="post" action="{{ url_for('priority_recalculate') }}">{{ csrf() }}<button class="btn ghost">Recalculate &amp; save</button></form></div>
+{% endif %}
+<div class="note">The active algorithm can be switched at run time — Weighted, FCFS, or Urgency-First — without any code changes required.</div>
+</div>
+</div>
+{% endblock %}

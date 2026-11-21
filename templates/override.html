@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="small"><a href="{{ url_for('schedule') }}">← Hearing Schedule</a></p>
+<h1>Manual override / reschedule · Hearing #{{ h.schedule_id }}</h1>
+<p class="sub">Hearing Rescheduling · Validated by the 5-link conflict chain and subject to fresh judicial approval</p>
+<div class="grid g-side">
+<div class="card">
+  <dl class="kv">
+    <dt>Case</dt><dd class="mono">{{ h.case_id }}</dd>
+    <dt>Judge</dt><dd>{{ judge_names.get(h.judge_id) }}</dd>
+    <dt>Current slot</dt><dd>{{ h.hearing_date }} {{ h.hearing_time }}–{{ h.end_time }} · {{ room_names.get(h.courtroom_id) }}</dd>
+    <dt>Status</dt><dd><span class="badge b-{{ h.status }}">{{ h.status|status_label }}</span></dd>
+  </dl>
+  <form method="post" class="mt">{{ csrf() }}
+    <div class="row">
+      <div><label>New date</label><input type="date" name="date" value="{{ form.get('date') }}" min="{{ today }}" required></div>
+      <div><label>Start time (1-hour slot)</label><input type="time" name="start" value="{{ form.get('start') }}" required></div>
+      <div><label>Courtroom</label><select name="courtroom_id">
+        {% for r in rooms %}<option value="{{ r.courtroom_id }}" {{ 'selected' if form.get('courtroom_id') == r.courtroom_id|string }}>{{ r.room_name }}</option>{% endfor %}</select></div>
+    </div>
+    <label>Reason for change (required, audited)</label>
+    <input type="text" name="reason" value="{{ form.get('reason','') }}" maxlength="200">
+    <p class="actions"><button class="btn ghost" name="do" value="check">Check conflicts</button>
+       <button class="btn" name="do" value="save">Apply change</button></p>
+  </form>
+  {% if conflicts is not none %}
+    {% if conflicts %}
+      <div class="flash error"><b>{{ conflicts|length }} conflict(s) found by the chain:</b>
+        <ul>{% for c in conflicts %}<li><span class="mono">{{ c.conflict_type }}</span> – {{ c.description }}</li>{% endfor %}</ul></div>
+    {% else %}<div class="flash success">No conflicts – this slot is free.</div>{% endif %}
+  {% endif %}
+</div>
+<div class="card"><h2>Judge's available windows</h2>
+  <table>{% for a in slots %}<tr><td>{{ a.available_date }}</td><td class="small">{{ a.available_date|weekday }}</td><td>{{ a.start_time }}–{{ a.end_time }}</td></tr>
+  {% else %}<tr><td class="empty">No upcoming availability.</td></tr>{% endfor %}</table>
+  <div class="note">The 5-stage conflict validation checks judge availability, courtroom availability, judge double-booking, courtroom double-booking, and case double-booking — each stage runs independently.</div>
+</div></div>
+{% endblock %}

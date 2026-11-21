@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Register New Case</h1>
+<p class="sub">New Case Registration · Classification and legal rules enforced automatically</p>
+<div class="grid g-side">
+<div class="card">
+<form method="post">{{ csrf() }}
+  <div class="row">
+    <div><label>Case ID</label><input type="text" name="case_id" value="{{ form.get('case_id','') }}" placeholder="CR-2026-101" maxlength="20" required></div>
+    <div><label>Case type</label><select name="case_type" required>
+      {% for key, label, note in types %}<option value="{{ key }}" {{ 'selected' if form.get('case_type') == key }}>{{ label }}</option>{% endfor %}
+    </select></div>
+    <div><label>Filing date</label><input type="date" name="filing_date" value="{{ form.get('filing_date', today) }}" max="{{ today }}" required></div>
+  </div>
+  <label>Case title</label><input type="text" name="case_title" value="{{ form.get('case_title','') }}" maxlength="200" required>
+  <label>Parties (Plaintiff vs Defendant)</label><input type="text" name="parties" value="{{ form.get('parties','') }}" maxlength="200" placeholder="Ahmed Ali vs State">
+  <div class="row">
+    <div><label>Assigned judge</label><select name="judge_id"><option value="">— not yet assigned —</option>
+      {% for j in judges %}<option value="{{ j.judge_id }}" {{ 'selected' if form.get('judge_id') == j.judge_id|string }}>{{ j.name }} ({{ j.court_name }})</option>{% endfor %}</select></div>
+    <div><label>Counsel of record (lawyer)</label><select name="lawyer_id"><option value="">— none —</option>
+      {% for l in lawyers %}<option value="{{ l.user_id }}" {{ 'selected' if form.get('lawyer_id') == l.user_id|string }}>{{ l.name }}</option>{% endfor %}</select></div>
+  </div>
+  <label class="check"><input type="checkbox" name="is_urgent" value="1" {{ 'checked' if form.get('is_urgent') }}> Mark as urgent (Statutory priority)</label>
+  <label>Urgency reason (required if urgent)</label><input type="text" name="urgency_reason" value="{{ form.get('urgency_reason','') }}" maxlength="200">
+  <p><button class="btn">Register case</button></p>
+</form></div>
+<div class="card"><h2>Court Rules by Case Type</h2>
+  {% for key, label, note in types %}<p class="small"><b>{{ label }}</b> — {{ note }}</p>{% endfor %}
+  <div class="note">Bail applications are automatically marked urgent by statutory rule — no manual flag required.</div>
+</div>
+</div>
+{% endblock %}

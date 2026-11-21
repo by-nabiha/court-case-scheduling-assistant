@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>District Court Judicial Portal · Case Backlog Prioritization &amp; Scheduling</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="landing-body dark-theme">
+
+  <!-- Minimalist Dark Glassmorphism Header -->
+  <header class="dark-header">
+    <div class="landing-container dark-header-inner">
+      <div class="dark-brand">
+        <svg class="dark-brand-logo" viewBox="0 0 32 32" width="32" height="32" fill="none">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="50%" stop-color="#818cf8"/>
+              <stop offset="100%" stop-color="#c084fc"/>
+            </linearGradient>
+          </defs>
+          <path d="M4 16L16 4L28 16L16 28L4 16Z" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="16" cy="16" r="4" fill="url(#logoGrad)"/>
+        </svg>
+        <div class="brand-text-group">
+          <span class="dark-brand-title">DISTRICT COURT</span>
+          <span class="dark-brand-sub">Judicial Scheduling Portal</span>
+        </div>
+      </div>
+
+      <nav class="dark-nav-menu">
+        <a href="#overview">Overview</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#security">Security</a>
+        <a href="{{ url_for('login') }}" class="dark-nav-btn">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="dark-hero" id="overview">
+    <div class="landing-container dark-hero-container">
+      
+      <!-- Left Column -->
+      <div class="dark-hero-left">
+        <div class="hero-status-pill">
+          <span class="pulse-beacon"></span>
+          <span>District Judiciary Management System</span>
+        </div>
+
+        <h1 class="hero-headline">
+          Intelligent Case<br>Scheduling<span class="neon-period">.</span>
+        </h1>
+        <p class="hero-subheadline">
+          A next-generation judicial platform that automates case backlog prioritization, generates conflict-free hearing schedules, and maintains tamper-evident court records &mdash; all in one unified system.
+        </p>
+
+        <!-- Quick Case Search Bar -->
+        <div class="dark-search-box">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="case-search-input" placeholder="Search case ID or party name..." autocomplete="off">
+          <a href="{{ url_for('login') }}" class="search-action-btn">Track Case</a>
+        </div>
+
+        <!-- Hero Pill Action Buttons -->
+        <div class="hero-actions-row">
+          <a href="{{ url_for('login') }}" class="pill-btn primary-gradient-pill">Access Portal &rarr;</a>
+          <a href="#capabilities" class="pill-btn glass-pill">Explore Capabilities</a>
+        </div>
+
+        <!-- Key Metrics Strip -->
+        <div class="dark-metrics-strip">
+          <div class="metric-cell">
+            <span class="metric-val">100%</span>
+            <span class="metric-lbl">Conflict-Free</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-cell">
+            <span class="metric-val">Autonomous</span>
+            <span class="metric-lbl">Multi-Factor Triage</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-cell">
+            <span class="metric-val">Human-Led</span>
+            <span class="metric-lbl">Judicial Approval</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-cell">
+            <span class="metric-val">SHA-256</span>
+            <span class="metric-lbl">Tamper-Proof Ledger</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Judicial Operations Console (Product UI Showcase) -->
+      <div class="dark-hero-right">
+        <!-- Ambient Topographic Contour Wave Backdrop -->
+        <div class="topography-container">
+          <svg class="topography-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="waveGrad1" x1="20%" y1="0%" x2="80%" y2="100%">
+                <stop offset="0%" stop-color="#c084fc" stop-opacity="0.9"/>
+                <stop offset="45%" stop-color="#818cf8" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.9"/>
+              </linearGradient>
+              <linearGradient id="waveGrad2" x1="100%" y1="10%" x2="0%" y2="90%">
+                <stop offset="0%" stop-color="#f472b6" stop-opacity="0.8"/>
+                <stop offset="50%" stop-color="#a855f7" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.8"/>
+              </linearGradient>
+              <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="5" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <path d="M 300,50 C 440,65 540,165 545,300 C 550,445 435,545 300,545 C 160,545 55,440 55,300 C 55,160 160,35 300,50 Z" stroke="url(#waveGrad1)" stroke-width="1.8" filter="url(#neonGlow)"/>
+            <path d="M 300,80 C 425,95 515,185 520,300 C 525,420 420,515 300,515 C 180,515 85,420 85,300 C 85,180 175,65 300,80 Z" stroke="url(#waveGrad2)" stroke-width="1.6"/>
+            <path d="M 300,110 C 410,120 490,200 495,300 C 500,400 405,485 300,485 C 195,485 115,400 115,300 C 115,200 190,100 300,110 Z" stroke="url(#waveGrad1)" stroke-width="1.6"/>
+            <path d="M 300,140 C 395,150 465,215 470,300 C 475,380 390,455 300,455 C 210,455 140,380 140,300 C 140,220 205,130 300,140 Z" stroke="url(#waveGrad2)" stroke-width="1.5"/>
+            <path d="M 300,170 C 380,180 440,230 445,300 C 450,365 375,425 300,425 C 225,425 165,365 165,300 C 165,235 220,160 300,170 Z" stroke="url(#waveGrad1)" stroke-width="1.5"/>
+            <path d="M 300,200 C 365,208 415,248 420,300 C 425,350 360,395 300,395 C 240,395 190,350 190,300 C 190,250 235,192 300,200 Z" stroke="url(#waveGrad2)" stroke-width="1.4"/>
+            <path d="M 300,230 C 350,235 390,265 395,300 C 400,335 345,365 300,365 C 255,365 215,335 215,300 C 215,265 250,225 300,230 Z" stroke="url(#waveGrad1)" stroke-width="1.4"/>
+            <path d="M 300,255 C 335,260 365,280 370,300 C 375,322 332,342 300,342 C 268,342 238,322 238,300 C 238,278 265,250 300,255 Z" stroke="url(#waveGrad2)" stroke-width="1.3"/>
+            <path d="M 300,275 C 322,278 342,290 345,300 C 348,312 320,322 300,322 C 280,322 258,312 258,300 C 258,288 278,272 300,275 Z" stroke="url(#waveGrad1)" stroke-width="1.2"/>
+            <path d="M 300,290 C 310,292 320,296 322,300 C 324,305 310,310 300,310 C 290,310 278,305 278,300 C 278,295 290,288 300,290 Z" stroke="url(#waveGrad2)" stroke-width="1.1"/>
+          </svg>
+        </div>
+
+        <!-- Glassmorphic Judicial Docket Terminal -->
+        <div class="docket-console-card">
+          <!-- Terminal Window Header -->
+          <div class="docket-console-header">
+            <div class="console-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="console-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" class="console-svg"><path d="M12 3v18M6 8l6-5 6 5M3 14l3-6 3 6a3 3 0 0 1-6 0zM15 14l3-6 3 6a3 3 0 0 1-6 0z"/><path d="M3 21h18"/></svg>
+              <span>LIVE COURTROOM ALLOCATION</span>
+            </div>
+            <div class="console-status">
+              <span class="pulse-beacon"></span>
+              <span>0 Conflicts</span>
+            </div>
+          </div>
+
+          <!-- Schedule Timeline Feed -->
+          <div class="docket-feed">
+            <!-- Row 1: Urgent Bail -->
+            <div class="docket-item urgent-slot">
+              <div class="docket-time">
+                <span class="time-main">09:30</span>
+                <span class="time-ampm">AM</span>
+              </div>
+              <div class="docket-info">
+                <div class="docket-case-header">
+                  <span class="docket-case-id">BA-2026-031</span>
+                  <span class="neon-chip chip-urgent">Urgent Bail &middot; 95.0</span>
+                </div>
+                <div class="docket-case-title">State v. Kamran &middot; Bail Petition</div>
+                <div class="docket-meta-row">
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Justice Fatima Noor</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M12 3l9 7H3l9-7z"/></svg> Courtroom 1</span>
+                  <span class="slot-badge verified">Confirmed</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Criminal Trial -->
+            <div class="docket-item">
+              <div class="docket-time">
+                <span class="time-main">11:00</span>
+                <span class="time-ampm">AM</span>
+              </div>
+              <div class="docket-info">
+                <div class="docket-case-header">
+                  <span class="docket-case-id">CR-2026-077</span>
+                  <span class="neon-chip chip-high">Priority &middot; 84.5</span>
+                </div>
+                <div class="docket-case-title">State v. Malik &middot; Speedy Trial Mandate</div>
+                <div class="docket-meta-row">
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Justice Imran Khan</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M12 3l9 7H3l9-7z"/></svg> Courtroom 2</span>
+                  <span class="slot-badge approved">Approved</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 3: Civil Petition -->
+            <div class="docket-item">
+              <div class="docket-time">
+                <span class="time-main">02:15</span>
+                <span class="time-ampm">PM</span>
+              </div>
+              <div class="docket-info">
+                <div class="docket-case-header">
+                  <span class="docket-case-id">CV-2026-104</span>
+                  <span class="neon-chip chip-vulnerable">Vulnerable Litigant</span>
+                </div>
+                <div class="docket-case-title">Ahmed v. Tariq &middot; Partition Dispute</div>
+                <div class="docket-meta-row">
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Justice Raza Ali</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M12 3l9 7H3l9-7z"/></svg> Courtroom 3</span>
+                  <span class="slot-badge allocated">Allocated</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Telemetry Integrity Bar -->
+          <div class="docket-telemetry-bar">
+            <div class="telemetry-pill">
+              <span class="check-mark">✓</span>
+              <span>5-Stage Collision Check: Passed</span>
+            </div>
+            <div class="telemetry-pill">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" class="telemetry-svg"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>SHA-256 Ledger Locked</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Capabilities Section -->
+  <section class="dark-section" id="capabilities">
+    <div class="landing-container">
+      <div class="dark-section-header">
+        <span class="neon-tag">SYSTEM CAPABILITIES</span>
+        <h2 class="dark-section-title">Integrated Court Administration</h2>
+        <p class="dark-section-sub">Comprehensive digital infrastructure engineered for trial efficiency, fairness, and transparency.</p>
+      </div>
+
+      <div class="dark-cards-grid">
+        <div class="dark-feature-card">
+          <div class="feature-card-glow"></div>
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>Case Intake &amp; Registration</h3>
+          <p>
+            Manages case filings, party verification, and automated completeness auditing. Bail applications and personal liberty matters are automatically flagged as urgent by statutory rule.
+          </p>
+          <ul class="feature-checklist">
+            <li><span>✓</span> Automated statutory urgency for bail petitions</li>
+            <li><span>✓</span> Duplicate filing and timeline validation</li>
+            <li><span>✓</span> Strict 7-stage lifecycle procedural tracking</li>
+          </ul>
+        </div>
+
+        <div class="dark-feature-card highlight-card">
+          <div class="feature-card-glow"></div>
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>Multi-Factor Priority Engine</h3>
+          <p>
+            Eliminates trial bottlenecks with objective mathematical scoring. Integrates legal urgency, litigant vulnerability, and waiting duration into transparent, deterministic rankings.
+          </p>
+          <ul class="feature-checklist">
+            <li><span>✓</span> Interchangeable scoring algorithms (Weighted, FCFS, Urgency-First)</li>
+            <li><span>✓</span> Itemized factor points show why each case is ranked</li>
+            <li><span>✓</span> Deterministic tie-breaking ensures fair queuing</li>
+          </ul>
+        </div>
+
+        <div class="dark-feature-card">
+          <div class="feature-card-glow"></div>
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3>Conflict-Free Hearing Allocation</h3>
+          <p>
+            Automated calendar optimization across judges and courtrooms. Allocates earliest open slots while strictly reserving final authorization for the assigned judge.
+          </p>
+          <ul class="feature-checklist">
+            <li><span>✓</span> 5-stage collision check prevents double-booking</li>
+            <li><span>✓</span> Formal judicial approval workflow keeps judges in control</li>
+            <li><span>✓</span> Live conflict auditing with manual rescheduling support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Judicial Workflow Section -->
+  <section class="dark-section workflow-bg" id="workflow">
+    <div class="landing-container">
+      <div class="dark-section-header">
+        <span class="neon-tag">PROCEDURAL LIFECYCLE</span>
+        <h2 class="dark-section-title">How Cases Move Through the System</h2>
+        <p class="dark-section-sub">From initial filing to validated docketing and final judgment disposal.</p>
+      </div>
+
+      <div class="dark-workflow-steps">
+        <div class="dark-step-card">
+          <div class="step-num-pill">01</div>
+          <h4>Intake &amp; Filing</h4>
+          <p>Clerk registers title, parties, and classification. Statutory urgency applied automatically.</p>
+        </div>
+
+        <div class="dark-step-card">
+          <div class="step-num-pill">02</div>
+          <h4>Completeness Audit</h4>
+          <p>Validation engine inspects party names and historical dates before eligibility is granted.</p>
+        </div>
+
+        <div class="dark-step-card">
+          <div class="step-num-pill">03</div>
+          <h4>Priority Scoring</h4>
+          <p>Algorithm calculates multi-factor score based on urgency, vulnerability, and pending days.</p>
+        </div>
+
+        <div class="dark-step-card">
+          <div class="step-num-pill">04</div>
+          <h4>Auto Scheduling</h4>
+          <p>Scheduler allocates earliest conflict-free hearing slot across judicial rosters.</p>
+        </div>
+
+        <div class="dark-step-card">
+          <div class="step-num-pill">05</div>
+          <h4>Judicial Approval</h4>
+          <p>Assigned Judge authorizes the proposed hearing, reschedules, or requests modifications.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security & Cryptography Standards -->
+  <section class="dark-section" id="security">
+    <div class="landing-container">
+      <div class="dark-section-header">
+        <span class="neon-tag">SECURITY ARCHITECTURE</span>
+        <h2 class="dark-section-title">Built-In Defense-in-Depth</h2>
+        <p class="dark-section-sub">Bank-grade cryptography and least-privilege controls protecting confidential legal proceedings.</p>
+      </div>
+
+      <div class="dark-security-grid">
+        <div class="dark-sec-card">
+          <div class="sec-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h4>Salted scrypt Hashing</h4>
+          <p>Slow, memory-hard key derivation prevents brute force cracking, enforced with complexity rules.</p>
+        </div>
+
+        <div class="dark-sec-card">
+          <div class="sec-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <h4>Account Lockout &amp; Rate Limits</h4>
+          <p>15-minute lockout after 5 consecutive failures, backed by constant-time anti-enumeration dummy hashes.</p>
+        </div>
+
+        <div class="dark-sec-card">
+          <div class="sec-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h4>Fernet AES-128 Field Encryption</h4>
+          <p>Vulnerable litigant disclosures are encrypted at rest and strictly omitted from audit logs.</p>
+        </div>
+
+        <div class="dark-sec-card">
+          <div class="sec-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <h4>SHA-256 Tamper-Evident Ledger</h4>
+          <p>Blockchain-inspired hash-chained audit log immediately detects any manual SQL modification or deletion.</p>
+        </div>
+
+        <div class="dark-sec-card">
+          <div class="sec-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h4>RFC 6238 TOTP Multi-Factor</h4>
+          <p>Native two-factor authentication compatible with Google Authenticator and Microsoft Authenticator.</p>
+        </div>
+
+        <div class="dark-sec-card">
+          <div class="sec-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h4>Strict Web Hardening</h4>
+          <p>Strict Content Security Policy without inline scripts, anti-clickjacking frame locks, and CSRF tokens.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="dark-section dark-cta-banner">
+    <div class="landing-container cta-banner-inner">
+      <div class="cta-text">
+        <h2 class="dark-section-title">Ready to Streamline Your Court?</h2>
+        <p class="dark-section-sub">Sign in now to manage cases, view schedules, and access the full judicial administration platform.</p>
+      </div>
+      <a href="{{ url_for('login') }}" class="pill-btn primary-gradient-pill cta-big-btn">Sign In to Portal &rarr;</a>
+    </div>
+  </section>
+
+  <!-- Dark Theme Footer -->
+  <footer class="dark-footer">
+    <div class="landing-container dark-footer-inner">
+      <div class="footer-brand-meta">
+        <span class="footer-title">District Court Case Backlog Prioritization &amp; Scheduling Assistant</span>
+        <p class="footer-subtitle">
+          Enterprise Judicial Administration Platform &middot; District Judiciary Directorate<br>
+          Automated Case Triage, Conflict-Free Calendaring &amp; Tamper-Evident Records
+        </p>
+      </div>
+      <div class="footer-status-tag">
+        <span class="green-indicator"></span>
+        <span>Secure Judicial Portal Active &middot; SHA-256 Ledger</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

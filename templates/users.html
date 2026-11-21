@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>User Management</h1>
+<p class="sub">System Administrator · manage users, access permissions and account security</p>
+<div class="grid g-side">
+<div class="card"><div class="wrap"><table>
+  <tr><th>User</th><th>Role</th><th>Status</th><th>2FA</th><th>Last login</th><th>Actions</th></tr>
+  {% for u in users %}{% set locked = u.locked_until and u.locked_until > now %}
+  <tr><td><b>{{ u.name }}</b><div class="small mono">{{ u.username }}</div></td><td>{{ roles[u.role] }}</td>
+    <td>{% if not u.is_active %}<span class="badge b-inactive">Disabled</span>{% elif locked %}<span class="badge b-locked">Locked until {{ u.locked_until[11:16] }}</span>{% else %}<span class="badge b-active">Active</span>{% endif %}
+        {% if u.failed_attempts %}<div class="small">{{ u.failed_attempts }} failed attempt(s)</div>{% endif %}</td>
+    <td>{% if u.totp_enabled %}<span class="badge b-on">On</span>{% else %}<span class="small">Off</span>{% endif %}</td>
+    <td class="small">{{ u.last_login[:16]|replace('T',' ') or '—' }}</td>
+    <td><div class="actions">
+      {% if locked %}<form method="post" action="{{ url_for('user_op', uid=u.user_id, op='unlock') }}">{{ csrf() }}<button class="btn sm">Unlock</button></form>{% endif %}
+      {% if u.user_id != user.user_id %}
+        {% if u.is_active %}<form method="post" action="{{ url_for('user_op', uid=u.user_id, op='deactivate') }}" data-confirm="Disable this account? The user loses access immediately.">{{ csrf() }}<button class="btn red sm">Disable</button></form>
+        {% else %}<form method="post" action="{{ url_for('user_op', uid=u.user_id, op='activate') }}">{{ csrf() }}<button class="btn ghost sm">Enable</button></form>{% endif %}
+      {% endif %}
+      {% if u.totp_enabled %}<form method="post" action="{{ url_for('user_op', uid=u.user_id, op='reset-2fa') }}" data-confirm="Remove two-factor authentication for this user?">{{ csrf() }}<button class="btn ghost sm">Reset 2FA</button></form>{% endif %}
+    </div>
+    <details><summary>Reset password</summary>
+      <form method="post" action="{{ url_for('user_op', uid=u.user_id, op='reset-password') }}">{{ csrf() }}
+        <input type="password" name="password" placeholder="New password" maxlength="128" required autocomplete="new-password">
+        <p><button class="btn sm">Set password</button></p></form></details></td></tr>
+  {% endfor %}
+</table></div></div>
+<div class="card"><h2>Create user</h2>
+  <form method="post" action="{{ url_for('user_create') }}" autocomplete="off">{{ csrf() }}
+    <label>Username</label><input type="text" name="username" maxlength="30" required>
+    <label>Full name</label><input type="text" name="name" maxlength="80" required>
+    <label>Email</label><input type="email" name="email" maxlength="100" required>
+    <label>Role</label><select name="role">{% for k, v in roles.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select>
+    <label>Initial password</label><input type="password" name="password" maxlength="128" required autocomplete="new-password">
+    <p class="small">Password policy: {{ rules }}.</p>
+    <p><button class="btn">Create user</button></p>
+  </form></div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><div><h1>Case Register</h1>
+<p class="sub">Active Case Records &amp; Docket{% if user.role == Role.LAWYER %} · showing only cases where you are counsel of record{% endif %}</p></div>
+{% if can('register_case') %}<div class="shrink"><a class="btn" href="{{ url_for('case_new') }}">+ Register case</a></div>{% endif %}</div>
+<div class="tabs">
+  <a href="{{ url_for('cases') }}" class="{{ 'on' if not status }}">All</a>
+  {% for s in ['REGISTERED','UPDATE_REQUIRED','VALIDATED','PRIORITIZED','SCHEDULED','HEARING_CONFIRMED','DISPOSED'] %}
+  <a href="{{ url_for('cases', status=s) }}" class="{{ 'on' if status == s }}">{{ s|status_label }}</a>{% endfor %}
+</div>
+<div class="card">
+  <form method="get" class="row"><input type="hidden" name="status" value="{{ status or '' }}">
+    <div><input type="text" name="q" value="{{ q }}" placeholder="Search by case ID, title or parties" maxlength="50"></div>
+    <div class="shrink"><button class="btn ghost">Search</button></div></form>
+  <div class="wrap"><table class="mt">
+  <tr><th>Case ID</th><th>Title</th><th>Type</th><th>Filed</th><th class="num">Days waiting</th><th>Flags</th><th>Priority</th><th>Status</th></tr>
+  {% for c in cases %}
+  <tr><td><a href="{{ url_for('case_detail', case_id=c.case_id) }}" class="mono">{{ c.case_id }}</a></td>
+      <td>{{ c.case_title }}<div class="small">{{ c.parties or '—' }}</div></td>
+      <td>{{ c.type_label }}</td><td>{{ c.filing_date }}</td><td class="num">{{ c.waiting_days() }}</td>
+      <td>{% if c.is_urgent %}<span class="badge b-urgent">Urgent</span>{% endif %}
+          {% if c.vulnerable_party %}<span class="badge b-vulnerable">Vulnerable</span>{% endif %}</td>
+      <td>{% if c.priority_level != 'UNASSESSED' %}<span class="badge b-{{ c.priority_level }}">{{ c.priority_level }}</span> <span class="small">{{ c.priority_score }}</span>{% else %}<span class="small">—</span>{% endif %}</td>
+      <td><span class="badge b-{{ c.case_status }}">{{ c.case_status|status_label }}</span></td></tr>
+  {% else %}<tr><td colspan="8" class="empty">No cases found.</td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endblock %}

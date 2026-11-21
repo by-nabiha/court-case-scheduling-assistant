@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In · District Court Judicial Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="landing-body dark-theme login-page-body">
+
+  <!-- Minimalist Dark Glassmorphism Header -->
+  <header class="dark-header">
+    <div class="landing-container dark-header-inner">
+      <a href="{{ url_for('landing') }}" class="dark-brand">
+        <svg class="dark-brand-logo" viewBox="0 0 32 32" width="32" height="32" fill="none">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="50%" stop-color="#818cf8"/>
+              <stop offset="100%" stop-color="#c084fc"/>
+            </linearGradient>
+          </defs>
+          <path d="M4 16L16 4L28 16L16 28L4 16Z" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="16" cy="16" r="4" fill="url(#logoGrad)"/>
+        </svg>
+        <div class="brand-text-group">
+          <span class="dark-brand-title">DISTRICT COURT</span>
+          <span class="dark-brand-sub">Judicial Scheduling Portal</span>
+        </div>
+      </a>
+
+      <nav class="dark-nav-menu">
+        <a href="{{ url_for('landing') }}" class="back-home-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span>Back to Overview</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Centered Login Card Container -->
+  <main class="login-page-main">
+    <div class="dark-signin-card login-centered-card" id="signin-section">
+      <div class="card-brand-tag">
+        <span class="court-icon-badge">⚖️</span>
+        <h2>Court Personnel Sign In</h2>
+        <p>Enter your judicial credentials or select a demo role below</p>
+      </div>
+
+      <!-- Demo Chips Selector -->
+      <div class="dark-demo-box login-demo-box">
+        <div class="demo-box-top">
+          <div class="demo-box-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            <span><b>Instant Demo Access</b> &middot; One-click autofill</span>
+          </div>
+          <span class="demo-pass-tag">Password: <code>Court@2026!</code></span>
+        </div>
+
+        <div class="dark-chips-grid">
+          <button type="button" class="dark-chip demo-chip" data-user="clerk.sara" data-pass="Court@2026!">
+            <span class="chip-ico">⚖️</span>
+            <span class="chip-text">
+              <span class="chip-usr">clerk.sara</span>
+              <span class="chip-desc">Court Clerk</span>
+            </span>
+          </button>
+
+          <button type="button" class="dark-chip demo-chip" data-user="judge.fatima" data-pass="Court@2026!">
+            <span class="chip-ico">👨‍⚖️</span>
+            <span class="chip-text">
+              <span class="chip-usr">judge.fatima</span>
+              <span class="chip-desc">Justice Fatima</span>
+            </span>
+          </button>
+
+          <button type="button" class="dark-chip demo-chip" data-user="judge.khan" data-pass="Court@2026!">
+            <span class="chip-ico">👨‍⚖️</span>
+            <span class="chip-text">
+              <span class="chip-usr">judge.khan</span>
+              <span class="chip-desc">Justice Khan</span>
+            </span>
+          </button>
+
+          <button type="button" class="dark-chip demo-chip" data-user="lawyer.ali" data-pass="Court@2026!">
+            <span class="chip-ico">💼</span>
+            <span class="chip-text">
+              <span class="chip-usr">lawyer.ali</span>
+              <span class="chip-desc">Adv. Ali Raza</span>
+            </span>
+          </button>
+
+          <button type="button" class="dark-chip demo-chip" data-user="admin.nabiha" data-pass="Court@2026!">
+            <span class="chip-ico">🏛️</span>
+            <span class="chip-text">
+              <span class="chip-usr">admin.nabiha</span>
+              <span class="chip-desc">Court Admin</span>
+            </span>
+          </button>
+
+          <button type="button" class="dark-chip demo-chip" data-user="sysadmin" data-pass="Court@2026!">
+            <span class="chip-ico">🛡️</span>
+            <span class="chip-text">
+              <span class="chip-usr">sysadmin</span>
+              <span class="chip-desc">Sysadmin</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {% with msgs = get_flashed_messages(with_categories=true) %}
+        {% for cat, m in msgs %}
+          <div class="dark-flash {{ cat }}">
+            <span>{{ m }}</span>
+          </div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="post" action="{{ url_for('login') }}" class="dark-form" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="dark-input-group">
+          <label for="username">Official Username</label>
+          <div class="dark-input-wrap">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <input type="text" id="username" name="username" value="{{ username or '' }}" placeholder="clerk.sara or admin.nabiha" maxlength="50" required autofocus>
+          </div>
+        </div>
+
+        <div class="dark-input-group">
+          <label for="password">Account Password</label>
+          <div class="dark-input-wrap">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input type="password" id="password" name="password" placeholder="••••••••••••" maxlength="128" required autocomplete="current-password">
+          </div>
+        </div>
+
+        <button type="submit" class="dark-submit-btn">
+          <span>Sign in to Judicial Portal</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </form>
+
+      <!-- Security Trust Indicator -->
+      <div class="dark-security-notice">
+        <div class="sec-label">
+          <span class="green-indicator"></span>
+          <span>Encrypted Judicial Portal Active</span>
+        </div>
+        <div class="sec-sub">
+          Salted scrypt hashing &middot; Fernet AES-128 field privacy &middot; 15-min lockout &middot; Tamper-evident SHA-256 ledger
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Dark Theme Footer -->
+  <footer class="dark-footer">
+    <div class="landing-container dark-footer-inner">
+      <div class="footer-brand-meta">
+        <span class="footer-title">District Court Case Backlog Prioritization &amp; Scheduling Assistant</span>
+        <p class="footer-subtitle">
+          Enterprise Judicial Administration Platform · District Judiciary Directorate
+        </p>
+      </div>
+      <div>
+        <a href="{{ url_for('landing') }}" class="dark-footer-btn">&larr; Back to Overview</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

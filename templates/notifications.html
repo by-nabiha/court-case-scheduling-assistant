@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Notifications</h1>
+<p class="sub">System alerts and case updates routed to the {{ user.role_label }} role.</p>
+<div class="card">
+    <table>
+        <tr>
+            <th>Time</th>
+            <th>Message</th>
+        </tr>
+        {% for n in notes %}<tr>
+            <td class="mono">{{ n['timestamp'] }}</td>
+            <td>{{ n['message'] }}</td>
+        </tr>
+        {% else %}<tr>
+            <td colspan="2" class="empty">No notifications.</td>
+        </tr>{% endfor %}
+    </table>
+</div>
+{% endblock %}

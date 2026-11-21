@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Judge &amp; Courtroom Availability</h1>
+<p class="sub">Judicial sitting rosters and courtroom operational status</p>
+<div class="grid g-side">
+<div class="card">
+  <h2>Upcoming availability</h2>
+  <div class="wrap"><table><tr><th>Date</th><th>Day</th><th>Resource</th><th>From</th><th>To</th><th></th></tr>
+  {% for a in slots %}
+    <tr><td>{{ a.available_date }}</td><td class="small">{{ a.available_date|weekday }}</td>
+      <td>{% if a.resource_type == 'JUDGE' %}{{ judge_names.get(a.resource_id) }}{% else %}{{ room_names.get(a.resource_id) }}{% endif %}
+          <span class="badge">{{ a.resource_type|status_label }}</span></td>
+      <td>{{ a.start_time }}</td><td>{{ a.end_time }}</td>
+      <td>{% if can('remove_availability') %}<form method="post" action="{{ url_for('availability_delete', aid=a.availability_id) }}" data-confirm="Remove this availability slot?">{{ csrf() }}<button class="btn red sm">Remove</button></form>{% endif %}</td></tr>
+  {% else %}<tr><td colspan="6" class="empty">No availability recorded.</td></tr>{% endfor %}
+  </table></div>
+</div>
+<div>
+  {% if can('add_availability') %}
+  <div class="card"><h2>Add availability</h2>
+    <form method="post" action="{{ url_for('availability_add') }}">{{ csrf() }}
+      <label>Judge or courtroom</label>
+      <select name="resource" required>
+        <optgroup label="Judges">{% for j in judges %}<option value="JUDGE:{{ j.judge_id }}">{{ j.name }}</option>{% endfor %}</optgroup>
+        <optgroup label="Courtrooms">{% for r in rooms %}<option value="COURTROOM:{{ r.courtroom_id }}">{{ r.room_name }}</option>{% endfor %}</optgroup>
+      </select>
+      <label>Date</label><input type="date" name="date" min="{{ today }}" required>
+      <div class="row"><div><label>From</label><input type="time" name="start" value="09:00" required></div>
+        <div><label>To</label><input type="time" name="end" value="13:00" required></div></div>
+      <p><button class="btn">Add slot</button></p>
+    </form></div>
+  {% endif %}
+  <div class="card"><h2>Courtrooms</h2>
+    <table>{% for r in rooms %}
+      <tr><td>{{ r.room_name }}</td><td><span class="badge b-{{ 'active' if r.availability_status == 'ACTIVE' else 'inactive' }}">{{ r.availability_status|status_label }}</span></td>
+      <td>{% if can('set_courtroom_status') %}
+        <form method="post" action="{{ url_for('courtroom_status', rid=r.courtroom_id) }}">{{ csrf() }}
+          <input type="hidden" name="status" value="{{ 'UNDER_MAINTENANCE' if r.availability_status == 'ACTIVE' else 'ACTIVE' }}">
+          <button class="btn ghost sm">{{ 'Set maintenance' if r.availability_status == 'ACTIVE' else 'Re-open' }}</button></form>{% endif %}</td></tr>
+    {% endfor %}</table></div>
+</div></div>
+{% endblock %}

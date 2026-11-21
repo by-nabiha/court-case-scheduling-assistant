@@ -1,0 +1,10 @@
+# secrets and local data - never commit
+instance/
+*.db
+*.key
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+demo/*.webm

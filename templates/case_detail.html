@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="small"><a href="{{ url_for('cases') }}">← Case Register</a></p>
+<h1><span class="mono">{{ case.case_id }}</span> · {{ case.case_title }}</h1>
+<p class="sub">{{ case.type_label }} · {{ case.parties or 'Parties not entered' }}</p>
+
+<div class="grid g-side">
+<div>
+  <div class="card">
+    <h2>Case information</h2>
+    <dl class="kv">
+      <dt>Status</dt><dd><span class="badge b-{{ case.case_status }}">{{ case.case_status|status_label }}</span>
+                         <span class="small">{{ case.state.description }}</span></dd>
+      <dt>Filing date</dt><dd>{{ case.filing_date }} · <b>{{ waiting }}</b> days pending</dd>
+      <dt>Assigned judge</dt><dd>{{ judge_names.get(case.judge_id, '— not assigned —') }}</dd>
+      <dt>Urgency</dt><dd>{% if case.is_urgent %}<span class="badge b-urgent">Urgent</span> {{ case.urgency_reason }}{% else %}Not urgent{% endif %}</dd>
+      <dt>Vulnerable litigant</dt><dd>{% if case.vulnerable_party %}<span class="badge b-vulnerable">Yes</span> {{ case.vulnerability_type }} <span class="small">(encrypted at rest)</span>{% else %}No{% endif %}</dd>
+      <dt>Priority</dt><dd>{% if case.priority_level != 'UNASSESSED' %}<span class="badge b-{{ case.priority_level }}">{{ case.priority_level }}</span> score {{ case.priority_score }}{% else %}Not yet assessed{% endif %}</dd>
+      {% if case.priority_explanation %}<dt>Why this priority</dt><dd class="small">{{ case.priority_explanation }}</dd>{% endif %}
+    </dl>
+  </div>
+
+  {% if hearings %}
+  <div class="card"><h2>Hearings</h2><table>
+    <tr><th>#</th><th>Date</th><th>Time</th><th>Judge</th><th>Room</th><th>Status</th><th>Note</th></tr>
+    {% for h in hearings %}<tr><td>{{ h.schedule_id }}</td><td>{{ h.hearing_date }}</td><td>{{ h.hearing_time }}–{{ h.end_time }}</td>
+      <td>{{ judge_names.get(h.judge_id) }}</td><td>{{ room_names.get(h.courtroom_id) }}</td>
+      <td><span class="badge b-{{ h.status }}">{{ h.status|status_label }}</span></td><td class="small">{{ h.reason }}</td></tr>{% endfor %}
+  </table></div>
+  {% endif %}
+
+  <div class="card"><h2>Audit History</h2>
+    <table><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr>
+    {% for r in history %}<tr><td class="mono">{{ r['timestamp'][5:16] }}</td><td>{{ r['user_name'] }}</td>
+      <td>{{ r['action']|status_label }}</td><td class="small">{{ r['details'] }}{% if r['reason'] %}<br><i>Reason: {{ r['reason'] }}</i>{% endif %}</td></tr>
+    {% else %}<tr><td colspan="4" class="empty">No recorded actions yet.</td></tr>{% endfor %}</table>
+  </div>
+</div>
+
+<div>
+  <div class="card"><h2>Case Lifecycle</h2>
+    <p class="small">Allowed now:
+      {% for ev in ['validate','request_correction','prioritize','schedule','confirm_hearing','return_to_backlog','dispose'] %}
+        {% if case.state.can(ev) %}<span class="badge">{{ ev|status_label }}</span>{% endif %}{% endfor %}</p>
+    {% if can('validate_case') and case.state.can('validate') %}
+      <form method="post" action="{{ url_for('case_validate', case_id=case.case_id) }}">{{ csrf() }}
+        <button class="btn green">Validate case information</button></form>
+    {% endif %}
+    {% if can('request_correction') and case.state.can('request_correction') %}
+      <details><summary>Request correction</summary>
+      <form method="post" action="{{ url_for('case_correction', case_id=case.case_id) }}">{{ csrf() }}
+        <label>Reason</label><input type="text" name="reason" maxlength="200" required>
+        <p><button class="btn red sm">Send back for correction</button></p></form></details>
+    {% endif %}
+  </div>
+
+  {% if case.state.editable %}
+  {% if can('update_case') %}
+  <div class="card"><h2>Update information</h2>
+    <form method="post" action="{{ url_for('case_update', case_id=case.case_id) }}">{{ csrf() }}
+      <label>Title</label><input type="text" name="case_title" value="{{ case.case_title }}" maxlength="200" required>
+      <label>Parties</label><input type="text" name="parties" value="{{ case.parties }}" maxlength="200">
+      {% if user.role != Role.LAWYER %}
+      <label>Assigned judge</label><select name="judge_id"><option value="">— not assigned —</option>
+        {% for j in judges %}<option value="{{ j.judge_id }}" {{ 'selected' if j.judge_id == case.judge_id }}>{{ j.name }}</option>{% endfor %}</select>
+      {% endif %}
+      <label>Reason for change (audited)</label><input type="text" name="reason" maxlength="200" required>
+      <p><button class="btn sm">Save changes</button></p>
+    </form></div>
+  {% endif %}
+
+  {% if can('mark_urgent') %}
+  <div class="card"><h2>Legal Urgency</h2>
+    <form method="post" action="{{ url_for('case_urgency', case_id=case.case_id) }}">{{ csrf() }}
+      <select name="is_urgent"><option value="1" {{ 'selected' if case.is_urgent }}>Urgent</option>
+        <option value="0" {{ 'selected' if not case.is_urgent }}>Not urgent</option></select>
+      <label>Reason / court rule</label><input type="text" name="reason" value="{{ case.urgency_reason }}" maxlength="200" required>
+      <p><button class="btn sm">Update urgency</button></p></form></div>
+  {% endif %}
+
+  {% if can('record_vulnerability') %}
+  <div class="card"><h2>Vulnerable Litigant</h2>
+    <form method="post" action="{{ url_for('case_vulnerability', case_id=case.case_id) }}">{{ csrf() }}
+      <select name="vulnerable"><option value="1" {{ 'selected' if case.vulnerable_party }}>Yes – vulnerable party involved</option>
+        <option value="0" {{ 'selected' if not case.vulnerable_party }}>No</option></select>
+      <label>Type</label><select name="vulnerability_type"><option value="">—</option>
+        {% for v in vtypes %}<option {{ 'selected' if v == case.vulnerability_type }}>{{ v }}</option>{% endfor %}</select>
+      <label>Note (optional)</label><input type="text" name="reason" maxlength="200">
+      <p><button class="btn sm">Save</button></p></form>
+    <p class="small">The detail is encrypted in the database and is not written into the audit log.</p></div>
+  {% endif %}
+  {% endif %}
+</div>
+</div>
+{% endblock %}

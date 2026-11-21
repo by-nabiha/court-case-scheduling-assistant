@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verification · District Court Judicial Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="landing-body dark-theme login-page-body">
+  <main class="login-page-main">
+    <div class="dark-signin-card login-centered-card">
+      <div class="card-brand-tag">
+        <span class="court-icon-badge">📱</span>
+        <h2>Two-Factor Verification</h2>
+        <p>Enter the 6-digit code from your authenticator app</p>
+      </div>
+      {% with msgs = get_flashed_messages(with_categories=true) %}
+        {% for cat, m in msgs %}<div class="dark-flash {{ cat }}"><span>{{ m }}</span></div>{% endfor %}
+      {% endwith %}
+      <form method="post" action="{{ url_for('login_verify') }}" class="dark-form" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="dark-input-group">
+          <label for="code">Verification Code</label>
+          <div class="dark-input-wrap">
+            <input type="text" id="code" name="code" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" placeholder="123 456" required autofocus>
+          </div>
+        </div>
+        <button type="submit" class="dark-submit-btn">
+          <span>Verify &amp; Continue</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </form>
+      <div class="info-card-trust">
+        <a href="{{ url_for('login') }}" class="back-home-link">&larr; Back to sign in</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

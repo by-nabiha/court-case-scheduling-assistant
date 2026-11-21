@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>My Account</h1>
+<p class="sub">{{ me.name }} · {{ me.username }} · {{ me.role_label }}</p>
+<div class="grid g2">
+<div class="card"><h2>Change password</h2>
+  <form method="post" autocomplete="off">{{ csrf() }}<input type="hidden" name="op" value="password">
+    <label>Current password</label><input type="password" name="current" maxlength="128" required autocomplete="current-password">
+    <label>New password</label><input type="password" name="new" maxlength="128" required autocomplete="new-password">
+    <p class="small">Policy: {{ rules }}.</p>
+    <p><button class="btn">Change password</button></p></form></div>
+<div class="card"><h2>Two-factor authentication</h2>
+  {% if me.totp_enabled %}
+    <p><span class="badge b-on">ON</span> Each login needs a 6-digit code from your authenticator app.</p>
+    <p class="small">Lost your phone? Ask the System Administrator to reset two-factor authentication.</p>
+  {% elif qr %}
+    <p>1. Scan this QR code with Google Authenticator or Microsoft Authenticator.</p>
+    <img class="qr" src="{{ qr }}" alt="QR code for authenticator app">
+    <p class="small">Or enter this key manually: <span class="mono">{{ secret }}</span></p>
+    <form method="post">{{ csrf() }}<input type="hidden" name="op" value="2fa-confirm">
+      <label>2. Enter the 6-digit code shown in the app</label>
+      <input type="text" name="code" inputmode="numeric" maxlength="7" required>
+      <p><button class="btn">Confirm &amp; enable</button></p></form>
+  {% else %}
+    <p><span class="small">Currently OFF.</span> Add a second step to your login using a phone authenticator app (TOTP, RFC 6238).</p>
+    <form method="post">{{ csrf() }}<input type="hidden" name="op" value="2fa-begin"><button class="btn">Set up two-factor</button></form>
+  {% endif %}
+</div></div>
+{% endblock %}

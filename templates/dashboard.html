@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+<p class="sub">Backlog overview for {{ user.role_label }}{% if user.role == Role.LAWYER %} (your cases only){% endif %} · {{ today }}</p>
+<div class="grid g4">
+  <div class="stat"><div class="n">{{ stats.pending }}</div><div class="l">Pending cases</div></div>
+  <div class="stat warn"><div class="n">{{ stats.urgent }}</div><div class="l">Urgent cases</div></div>
+  <div class="stat"><div class="n">{{ stats.vulnerable }}</div><div class="l">Vulnerable litigants</div></div>
+  <div class="stat"><div class="n">{{ stats.avg_wait }}</div><div class="l">Average days waiting</div></div>
+  <div class="stat"><div class="n">{{ stats.awaiting_validation }}</div><div class="l">Awaiting validation</div></div>
+  <div class="stat"><div class="n">{{ stats.pending_approval }}</div><div class="l">Hearings pending approval</div></div>
+  <div class="stat {{ 'warn' if stats.open_conflicts }}"><div class="n">{{ stats.open_conflicts }}</div><div class="l">Open conflicts</div></div>
+  <div class="stat"><div class="n">{{ stats.total }}</div><div class="l">Total cases</div></div>
+</div>
+<div class="grid g-side">
+  <div class="card">
+    <h2>Upcoming hearings</h2>
+    {% if stats.upcoming %}
+    <table><tr><th>Date</th><th>Time</th><th>Case</th><th>Judge</th><th>Room</th><th>Status</th></tr>
+    {% for h in stats.upcoming %}
+      <tr><td>{{ h.hearing_date }}</td><td>{{ h.hearing_time }}</td>
+          <td><a href="{{ url_for('case_detail', case_id=h.case_id) }}">{{ h.case_id }}</a></td>
+          <td>{{ judge_names.get(h.judge_id) }}</td><td>{{ room_names.get(h.courtroom_id) }}</td>
+          <td><span class="badge b-{{ h.status }}">{{ h.status|status_label }}</span></td></tr>
+    {% endfor %}</table>
+    {% else %}<p class="empty">No hearings scheduled yet.</p>{% endif %}
+    <h2 class="mt">Case Lifecycle Summary</h2>
+    <table>{% for s, n in stats.by_status.items() %}
+      <tr><td><span class="badge b-{{ s }}">{{ s|status_label }}</span></td><td class="num">{{ n }}</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div class="card">
+    <h2>Notifications</h2>
+    {% for n in notes %}<p class="small"><b>{{ n['timestamp'][5:16] }}</b> · {{ n['message'] }}</p>
+    {% else %}<p class="empty">No notifications.</p>{% endfor %}
+    <a href="{{ url_for('notifications') }}">All notifications</a>
+  </div>
+</div>
+{% endblock %}
